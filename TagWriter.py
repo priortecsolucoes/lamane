@@ -2,10 +2,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import psycopg2
 import os
-from dotenv import load_dotenv
 
 app = FastAPI()
-load_dotenv()
 
 VALID_ACCESS_KEY = 0112358  # Use uma variável de ambiente ou um valor fixo
 
