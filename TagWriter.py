@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 app = FastAPI()
 load_dotenv()
 
-VALID_ACCESS_KEY = os.getenv("EXPECTED_ACCESS_KEY")  # Use uma variável de ambiente ou um valor fixo
+VALID_ACCESS_KEY = 0112358  # Use uma variável de ambiente ou um valor fixo
 
 class WriteTagRequest(BaseModel):
     tagName: str
