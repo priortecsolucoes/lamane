@@ -12,7 +12,7 @@ class WriteTagRequest(BaseModel):
     stringValue: str
     intValue: int
     doubleValue: float
-    accessKey: int  
+    accessKey: string  
 
 class TagService:
     @staticmethod
