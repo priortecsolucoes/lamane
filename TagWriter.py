@@ -9,6 +9,7 @@ VALID_ACCESS_KEY = os.getenv("EXPECTED_ACCESS_KEY")
 
 class WriteTagRequest(BaseModel):
     tagName: str
+    companyId: int
     stringValue: str
     intValue: int
     doubleValue: float
@@ -38,36 +39,36 @@ class TagService:
             cursor = conn.cursor()
             
             # Verifica se a tag existe
-            selectTagQuery = "SELECT id FROM tag WHERE name = %s"
-            cursor.execute(selectTagQuery, (request.tagName,))
-            tagId = cursor.fetchone()
-            if tagId:
-                tagId = tagId[0]
+            selectTagQuery = "SELECT id FROM comapany_tag WHERE tag_id = (SELECT id from tag WHERE name = %s) AND company_id = (SELECT id from company WHERE company_pdv_number = %s)"
+            cursor.execute(selectTagQuery, (request.tagName, request.companyId))
+            companyTagId = cursor.fetchone()
+            if companyTagId:
+                companyTagId = companyTagId[0]
 
                 # Verifica se ja existem valores para a tag
-                checkValueQuery = "SELECT * FROM tag_value WHERE tag_id = %s"
-                cursor.execute(checkValueQuery, (tagId,))
+                checkValueQuery = "SELECT * FROM tag_value WHERE company_tag_id = %s"
+                cursor.execute(checkValueQuery, (companyTagId,))
                 existingValue = cursor.fetchone()
 
                 if existingValue:
                     updateQuery = """
                     UPDATE tag_value
                     SET string_value = %s, int_value = %s, double_value = %s
-                    WHERE tag_id = %s
+                    WHERE company_tag_id = %s
                     """
                     cursor.execute(updateQuery, (
                         request.stringValue, 
                         request.intValue, 
                         request.doubleValue, 
-                        tagId
+                        companyTagId
                     ))
                 else:# Insere o primeiro valor caso nao exista
                     insertValueQuery = """
-                    INSERT INTO tag_value (tag_id, string_value, int_value, double_value)
+                    INSERT INTO tag_value (company_tag_id, string_value, int_value, double_value)
                     VALUES (%s, %s, %s, %s)
                     """
                     cursor.execute(insertValueQuery, (
-                        tagId, 
+                        companyTagId, 
                         request.stringValue, 
                         request.intValue, 
                         request.doubleValue
