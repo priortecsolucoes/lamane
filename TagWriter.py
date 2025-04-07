@@ -39,7 +39,7 @@ class TagService:
             cursor = conn.cursor()
             
             # Verifica se a tag existe
-            selectTagQuery = "SELECT id FROM comapany_tag WHERE tag_id = (SELECT id from tag WHERE name = %s) AND company_id = (SELECT id from company WHERE company_pdv_number = %s)"
+            selectTagQuery = "SELECT id FROM company_tag WHERE tag_id = (SELECT id from tag WHERE name = %s) AND company_id = (SELECT id from company WHERE company_pdv_number = %s)"
             cursor.execute(selectTagQuery, (request.tagName, request.companyId))
             companyTagId = cursor.fetchone()
             if companyTagId:
