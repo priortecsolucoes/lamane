@@ -26,6 +26,7 @@ class TagService:
         )
     @staticmethod
     def validateAccessKey(accessKey):
+        print(VALID_ACCESS_KEY)
         if accessKey != VALID_ACCESS_KEY:
             raise HTTPException(status_code=403, detail="Access denied: Invalid access key")
 
