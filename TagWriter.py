@@ -84,5 +84,4 @@ class TagService:
 
 @app.put("/update-tag")
 def writeTag(request: WriteTagRequest):
-    print("Recebida solicitação de update:", request)
     return TagService.updateTag(request)
