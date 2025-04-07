@@ -5,7 +5,7 @@ import os
 
 app = FastAPI()
 
-VALID_ACCESS_KEY = 0112358  # Use uma variável de ambiente ou um valor fixo
+VALID_ACCESS_KEY = os.getenv("EXPECTED_ACCESS_KEY") 
 
 class WriteTagRequest(BaseModel):
     tagName: str
@@ -18,11 +18,11 @@ class TagService:
     @staticmethod
     def getDbConnection():
         return psycopg2.connect(
-            host= 'postgres.railway.internal',
-            database= 'railway',
-            user= 'postgres',
-            password= 'HxtWVwDYJEIIcUgYUQAKlllcudMUWbax',
-            port= 5432
+            host=os.getenv('HOST'),
+            database=os.getenv('DATABASE'),
+            user=os.getenv('USER'),
+            password=os.getenv('PASSWORD'),
+            port=os.getenv('PORT')
         )
     @staticmethod
     def validateAccessKey(accessKey):
