@@ -105,10 +105,10 @@ class TagService:
                     WHERE company_tag_id = %s
                 """
                 cursor.execute(insertHistoryQuery, (
-                    companyTagId,
                     request.stringValue,
                     request.intValue,
-                    request.doubleValue
+                    request.doubleValue,
+                    companyTagId
                 ))
 
                 conn.commit()
