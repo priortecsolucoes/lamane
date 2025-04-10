@@ -194,10 +194,11 @@ class TagService:
     @staticmethod
     def updateTagHistoryValue(request: WriteTagRequest):
         TagService.validateAccessKey(request.accessKey)
+        print("Iniciando o metodo")
         try:
             conn = TagService.getDbConnection()
             cursor = conn.cursor()
-
+            print("Iniciou o db, iniciou o cursor")
             selectTagQuery = """
             SELECT id FROM company_tag 
             WHERE tag_id = (SELECT id FROM tag WHERE name = %s)
@@ -208,7 +209,7 @@ class TagService:
 
             if companyTagId:
                 companyTagId = companyTagId[0]
-
+                print(companyTagId)
                 insertHistoryQuery = """
                 UPDATE tag_history_value
                     SET string_value = %s, int_value = %s, double_value = %s
@@ -223,9 +224,10 @@ class TagService:
 
                 conn.commit()
                 message = "Histórico da tag atualizado com sucesso"
+                print(message)
             else:
                 message = "Tag não encontrada. Nenhum histórico foi registrado."
-
+                print(message)
             cursor.close()
             conn.close()
             return {"message": message}
