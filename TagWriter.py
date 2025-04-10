@@ -108,7 +108,6 @@
 
 
 
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import psycopg2
@@ -209,8 +208,9 @@ class TagService:
                 companyTagId = companyTagId[0]
 
                 insertHistoryQuery = """
-                INSERT INTO tag_history_value (company_tag_id, string_value, int_value, double_value)
-                VALUES (%s, %s, %s, %s)
+                UPDATE tag_history_value
+                    SET string_value = %s, int_value = %s, double_value = %s
+                    WHERE company_tag_id = %s
                 """
                 cursor.execute(insertHistoryQuery, (
                     companyTagId,
