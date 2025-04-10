@@ -237,6 +237,6 @@ class TagService:
 def writeTag(request: WriteTagRequest):
     return TagService.updateTag(request)
 
-@app.post("/update-tag-history")
+@app.put("/update-tag-history")
 def writeTagHistory(request: WriteTagRequest):
     return TagService.updateTagHistoryValue(request)
