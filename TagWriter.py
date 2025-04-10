@@ -206,8 +206,8 @@ class TagService:
             """
             cursor.execute(selectTagQuery, (request.tagName, request.companyId))
             companyTagId = cursor.fetchone()
-            print(tagName)
-            print(companyId)
+            print(request.tagName)
+            print(request.companyId)
             if companyTagId:
                 companyTagId = companyTagId[0]
                 print(companyTagId)
