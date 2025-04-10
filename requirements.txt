@@ -1,0 +1,14 @@
+streamlit
+psycopg2
+matplotlib
+pandas 
+matplotlib
+seaborn 
+datetime 
+pytz 
+configparser
+python-dotenv
+requests
+datetime
+openpyxl
+xlsxwriter
