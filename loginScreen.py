@@ -38,6 +38,7 @@ class LoginScreen:
 
     def authenticateUser(self, username, password):
         conn = self.getDbConnection()
+        print('Conn: ',conn)
         if conn is None:
             return None
         try:
