@@ -171,7 +171,18 @@ class Main:
                                 {'selector': 'th', 'props': [('border', '1px solid black'), ('background-color', '#f0f0f0')]}
                             ])
 
-        st.markdown("### Período: 01/03 a D-1")
+        hoje = datetime.now()
+        if filtro_mes != "Acumulado":
+            mes_num = {
+                "JANEIRO": 1, "FEVEREIRO": 2, "MARÇO": 3, "ABRIL": 4, "MAIO": 5,
+                "JUNHO": 6, "JULHO": 7, "AGOSTO": 8, "SETEMBRO": 9, "OUTUBRO": 10,
+                "NOVEMBRO": 11, "DEZEMBRO": 12
+            }.get(filtro_mes, 4)  # abril como padrão
+            ano_atual = hoje.year
+            primeiro_dia = datetime(ano_atual, mes_num, 1)
+            st.markdown(f"### Período: {primeiro_dia.strftime('%d/%m')} a {hoje.strftime('%d/%m')}")
+        else:
+            st.markdown(f"### Período: Acumulado até {hoje.strftime('%d/%m')}")
         st.subheader("Tabela de Indicadores")
         st.dataframe(styled_df, use_container_width=True)
 
