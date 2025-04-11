@@ -7,10 +7,11 @@ import random
 from datetime import datetime
 
 st.set_page_config(page_title="Lamane - Indicadores IAF", layout="wide")
-pagesAcess = st.session_state.get("pagesAcess",0)
+pagesAcess = st.session_state.get("pagesAcess", 0)
 if not pagesAcess:
     st.switch_page("loginScreen.py")
 access = pagesAcess[0]
+
 st.markdown("""
     <style>
         section[data-testid="stSidebar"] {display: none;}
@@ -19,6 +20,8 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
+
+# ... imports e configuração da página permanecem os mesmos ...
 
 class Main:
     def __init__(self):
@@ -44,8 +47,7 @@ class Main:
                 "JANEIRO": "01", "FEVEREIRO": "02", "MARÇO": "03", "ABRIL": "04", "MAIO": "05",
                 "JUNHO": "06", "JULHO": "07", "AGOSTO": "08", "SETEMBRO": "09", "OUTUBRO": "10",
                 "NOVEMBRO": "11", "DEZEMBRO": "12"
-            }.get(mes, "04")  # padrão abril
-
+            }.get(mes, "04")
             date_filter = f"AND EXTRACT(MONTH FROM thv.history_date) = {mes_num}"
 
         query = f"""
@@ -76,7 +78,6 @@ class Main:
     def main(self):
         st.title("LAMANE - INDICADORES IAF")
 
-        # Filtros visuais
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             filtro_loja = st.text_input("Nº Loja")
@@ -105,6 +106,17 @@ class Main:
 
         df.rename(columns={"customer_name": "LOJAS", "alcance_valor": "ALCANCE META PEF", "alcance_pontuacao": "ALCANCE META PEF (PONTUAÇÃO)"}, inplace=True)
 
+        try:
+            company_df = pd.read_sql_query("SELECT customer_name, company_pdv_number FROM company", self.connection)
+            df = df.merge(company_df, left_on="LOJAS", right_on="customer_name", how="left")
+            df.rename(columns={"company_pdv_number": "PDV"}, inplace=True)
+            df.drop(columns=["customer_name"], inplace=True)
+        except Exception as e:
+            st.error(f"Erro ao adicionar coluna de PDV: {e}")
+            df["PDV"] = 0  # garante que a coluna exista para evitar erros futuros
+
+        df["PDV"] = df["PDV"].fillna(0).astype(int)
+
         if filtro_meta == "Abaixo da Meta":
             df = df[df["ALCANCE META PEF"] < 35]
         elif filtro_meta == "Meta Parcial":
@@ -121,7 +133,7 @@ class Main:
             "Conversão Ação de Fluxo": "86%",
             "Gestão de Categorias": "1,8%",
             "Auditoria em Lojas": "50%",
-            "Separação no Prazo": "98%",
+            "Separacão no Prazo": "98%",
             "Missões": "45%",
             "Loja DigitalAtivo - % de Atendimento": "90%",
             "Redes Sociais": "100%",
@@ -141,10 +153,14 @@ class Main:
             else:
                 return f"{random.uniform(10, 100):.2f}%"
 
-        for coluna in colunas_mock.keys():
-            df[coluna] = [gerar_valor(coluna) for _ in range(len(df))]
+        for col in colunas_mock.keys():
+            df[col] = [gerar_valor(col) for _ in range(len(df))]
 
-        colunas_ordenadas = ["LOJAS", "ALCANCE META PEF", "ALCANCE META PEF (PONTUAÇÃO)"] + list(colunas_mock.keys())
+        # formatar para 2 casas decimais com %
+        for col in colunas_mock.keys():
+            df[col] = df[col].apply(lambda x: f"{float(str(x).replace('%','').replace(',', '.')):.2f}%")
+
+        colunas_ordenadas = ["LOJAS", "PDV", "ALCANCE META PEF", "ALCANCE META PEF (PONTUAÇÃO)"] + list(colunas_mock.keys())
         df = df[colunas_ordenadas]
 
         def highlight_all_indicators(val):
@@ -166,7 +182,7 @@ class Main:
         styled_df = df.style.map(highlight_all_indicators, subset=colunas_indicadores) \
                             .set_properties(**{'border': '1px solid black'}) \
                             .set_properties(subset=colunas_indicadores, **{'color': 'black'}) \
-                            .set_properties(subset=['LOJAS'], **{'color': 'white'}) \
+                            .set_properties(subset=['LOJAS', 'PDV'], **{'color': 'white', 'background-color': '#262730'})\
                             .set_table_styles([
                                 {'selector': 'th', 'props': [('border', '1px solid black'), ('background-color', '#f0f0f0')]}
                             ])
@@ -177,12 +193,13 @@ class Main:
                 "JANEIRO": 1, "FEVEREIRO": 2, "MARÇO": 3, "ABRIL": 4, "MAIO": 5,
                 "JUNHO": 6, "JULHO": 7, "AGOSTO": 8, "SETEMBRO": 9, "OUTUBRO": 10,
                 "NOVEMBRO": 11, "DEZEMBRO": 12
-            }.get(filtro_mes, 4)  # abril como padrão
+            }.get(filtro_mes, 4)
             ano_atual = hoje.year
             primeiro_dia = datetime(ano_atual, mes_num, 1)
             st.markdown(f"### Período: {primeiro_dia.strftime('%d/%m')} a {hoje.strftime('%d/%m')}")
         else:
             st.markdown(f"### Período: Acumulado até {hoje.strftime('%d/%m')}")
+
         st.subheader("Tabela de Indicadores")
         st.dataframe(styled_df, use_container_width=True)
 
@@ -193,7 +210,7 @@ class Main:
         with col2:
             st.markdown("**Status Integração - Gestão Integrada:** 🟢 Verde")
         with col3:
-            st.markdown("**Status Integração - Medallia:** :red_circle: Vermelho")
+            st.markdown("**Status Integração - Medallia:** 🔴 Vermelho")
 
         st.subheader("Últimos Logs")
         st.markdown("""
