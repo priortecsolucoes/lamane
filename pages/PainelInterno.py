@@ -135,11 +135,11 @@ class Main:
             if "Serviços" in indicador:
                 return str(random.randint(5, 100))
             elif "Gestão de Categorias" in indicador:
-                return f"{round(random.uniform(0.5, 3.5), 1)}%"
+                return f"{random.uniform(0.5, 3.5):.2f}%"
             elif "ID Cliente" in indicador:
-                return f"{random.randint(60, 95)}%"
+                return f"{random.uniform(60, 95):.2f}%"
             else:
-                return f"{random.randint(10, 100)}%"
+                return f"{random.uniform(10, 100):.2f}%"
 
         for coluna in colunas_mock.keys():
             df[coluna] = [gerar_valor(coluna) for _ in range(len(df))]
